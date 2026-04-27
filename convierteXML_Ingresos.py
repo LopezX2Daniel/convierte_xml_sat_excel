@@ -14,7 +14,7 @@ from datetime import datetime
 fechaHoy = datetime.today().strftime("%Y-%m-%d %H:%M")
 print("Inicio:", fechaHoy)
 
-directorio_padre = r"/home/gnirut/Descargas/Attachments-Correcto cfdi Victor"
+directorio_padre = r""
 acumulado = {}
 sepan_cuantos = 0
 
