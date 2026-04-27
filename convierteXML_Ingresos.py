@@ -14,7 +14,7 @@ from datetime import datetime
 fechaHoy = datetime.today().strftime("%Y-%m-%d %H:%M")
 print("Inicio:", fechaHoy)
 
-directorio_padre = r"/home/files/Downloads/XML"
+directorio_padre = r"/home/gnirut/Descargas/Attachments-Correcto cfdi Victor"
 acumulado = {}
 sepan_cuantos = 0
 
@@ -86,9 +86,9 @@ for archivo in os.listdir(fr"{directorio_padre}"):
 
 df = pd.DataFrame.from_dict(acumulado, orient="index", columns = ["ClaveProdServ", "ClaveUnidad", "Descripcion", "Descuento", "IVA por CFDI", "ObjetoImp", "Cantidad", "ValorUnitario", "PxQ", "Archivo", "RFC_EMISOR", "NOMBRE_EMISOR", "RFC_RECEPTOR", "NOMBRE_RECEPTOR", "Impuesto", "TasaOCuota", "UUID", "FechaTimbrado"])
 df = df.astype(tipo_datos)
-df.to_excel(fr"{directorio_padre}/datos.xlsx", index=False)
+df.to_excel(fr"{directorio_padre}/xml_ingreso_leidos.xlsx", index=False)
 
 fechaHoy = datetime.today().strftime("%Y-%m-%d %H:%M")
 print("Terminado:", fechaHoy)
 
-print("Excel disponible en: ", fr"{directorio_padre}/xml_leidos.xlsx")
+print("Excel disponible en: ", fr"{directorio_padre}/xml_ingreso_leidos.xlsx")

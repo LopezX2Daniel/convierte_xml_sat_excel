@@ -1,5 +1,6 @@
+#%%
 # Actualizar la variable de "directorio_padre"
-# En la variable "VERSION" se declara la versión del CFDI para procesar el parsing específico
+# En la variable "VERSION_NOMINA" se declara la versión del CFDI para procesar el parsing específico
 # Dentro de la carpeta de directorio_padre, debe tener esta estructura con todos los XML a convertir:
 # 📁 directorio_padre/
 # ├── 📄 296391be-1ef4-4d1f-8d19-573ea4e9fa5d.xml
@@ -12,20 +13,21 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 from datetime import datetime
 
-VERSION = "1.1"
-# VERSION = "1.2"
+#VERSION_NOMINA = "1.1"
+VERSION_NOMINA = "1.2"
 
 fechaHoy = datetime.today().strftime("%Y-%m-%d %H:%M")
 print("Inicio:", fechaHoy)
 
-directorio_padre = r"/home/files/Downloads/XML"
+directorio_padre = r"/home/gnirut/Descargas/Attachments-Correcto cfdi Victor"
 acumulado = {}
 sepan_cuantos = 0
 
 
-if VERSION == "1.1":
+if VERSION_NOMINA == "1.1":
     for archivo in os.listdir(fr"{directorio_padre}"):
         if archivo[-4:].lower() == ".xml":
+            print(fr"{directorio_padre}/{archivo}")
             arbol = ET.parse(fr"{directorio_padre}/{archivo}")
             raiz = arbol.getroot()
             dict_cfdi_1 = raiz.attrib
@@ -106,14 +108,14 @@ if VERSION == "1.1":
     df = df[["Archivo", "UUID", "NOMBRE_RECEPTOR", "RFC_RECEPTOR", "NOMBRE_EMISOR", "RFC_EMISOR", "TipoDeComprobante", "FechaTimbrado", "RegistroPatronal",
              "FechaInicialPago", "FechaFinalPago", "Clave", "TipoPercepcion", "TipoDeduccion", "Concepto", "Importe", "ImporteGravado", "ImporteExento",
              "TotalPercepciones", "TotalDeducciones", "TotalOtrosPagos"]]
-    df.to_excel(fr"{directorio_padre}/xml_leidos.xlsx", index=False)
+    df.to_excel(fr"{directorio_padre}/xml_nomina_leidos.xlsx", index=False)
 
     fechaHoy = datetime.today().strftime("%Y-%m-%d %H:%M")
     print("Terminado:", fechaHoy)
 
-    print("Excel disponible en: ", fr"{directorio_padre}/xml_leidos.xlsx")
+    print("Excel disponible en: ", fr"{directorio_padre}/xml_nomina_leidos.xlsx")
 
-if VERSION == "1.2":
+if VERSION_NOMINA == "1.2":
     for archivo in os.listdir(fr"{directorio_padre}"):
         if archivo[-4:].lower() == ".xml":
             arbol = ET.parse(fr"{directorio_padre}/{archivo}")
@@ -161,39 +163,43 @@ if VERSION == "1.2":
                                 try:
                                     dict_datos_cfdi["TotalDeducciones"] = subrama.attrib["TotalDeducciones"]
                                 except KeyError:
-                                    dict_datos_cfdi["TotalDeducciones"] = "NO DISPONIBLE"
+                                    dict_datos_cfdi["TotalDeducciones"] = None
                                 try:
                                     dict_datos_cfdi["FechaInicialPago"] = subrama.attrib["FechaInicialPago"]
                                 except KeyError:
-                                    dict_datos_cfdi["TotalDeducciones"] = "NO DISPONIBLE"
+                                    dict_datos_cfdi["FechaInicialPago"] = None
                                 try:
                                     dict_datos_cfdi["FechaFinalPago"] = subrama.attrib["FechaFinalPago"]
                                 except KeyError:
-                                    dict_datos_cfdi["TotalDeducciones"] = "NO DISPONIBLE"
+                                    dict_datos_cfdi["FechaFinalPago"] = None
                                 try:
                                     dict_datos_cfdi["TotalPercepciones"] = subrama.attrib["TotalPercepciones"]
                                 except KeyError:
-                                    dict_datos_cfdi["TotalDeducciones"] = "NO DISPONIBLE"
-                                try:
-                                    dict_datos_cfdi["TotalDeducciones"] = subrama.attrib["TotalDeducciones"]
-                                except KeyError:
-                                    dict_datos_cfdi["TotalDeducciones"] = "NO DISPONIBLE"
+                                    dict_datos_cfdi["TotalPercepciones"] = None
                                 try:
                                     dict_datos_cfdi["TotalOtrosPagos"] = subrama.attrib["TotalOtrosPagos"]
                                 except KeyError:
-                                    dict_datos_cfdi["TotalDeducciones"] = "NO DISPONIBLE"
+                                    dict_datos_cfdi["TotalOtrosPagos"] = None
 
                                 for subsubrama in subrama:
                                     if "Emisor" in str(subsubrama):
-                                        dict_datos_cfdi["RegistroPatronal"] = subsubrama.attrib["RegistroPatronal"]
+                                        try:
+                                            dict_datos_cfdi["RegistroPatronal"] = subsubrama.attrib["RegistroPatronal"]
+                                        except KeyError:
+                                            dict_datos_cfdi["RegistroPatronal"] = "NA"
 
                                     if "Percepciones" in str(subsubrama):
                                         for percepcion in subsubrama:
-                                            listado_conceptos.append(percepcion.attrib)
+                                            if "Percepcion" in str(percepcion):
+                                                listado_conceptos.append(percepcion.attrib)
 
                                     if "Deducciones" in str(subsubrama):
                                         for deduccion in subsubrama:
                                             listado_conceptos.append(deduccion.attrib)
+
+                                    if "OtrosPagos" in str(subsubrama):
+                                        for otrospagos in subsubrama:
+                                            listado_conceptos.append(otrospagos.attrib)
 
                 for folio, concepto_unico in enumerate(listado_conceptos):
                     dict_temporal = concepto_unico
@@ -212,9 +218,9 @@ if VERSION == "1.2":
     df = df[["Archivo", "UUID", "NOMBRE_RECEPTOR", "RFC_RECEPTOR", "NOMBRE_EMISOR", "RFC_EMISOR", "TipoDeComprobante", "FechaTimbrado", "RegistroPatronal",
              "FechaInicialPago", "FechaFinalPago", "Clave", "TipoPercepcion", "TipoDeduccion", "Concepto", "Importe", "ImporteGravado", "ImporteExento",
              "TotalPercepciones", "TotalDeducciones", "TotalOtrosPagos"]]
-    df.to_excel(fr"{directorio_padre}/xml_leidos.xlsx", index=False)
+    df.to_excel(fr"{directorio_padre}/xml_nomina_leidos.xlsx", index=False)
 
     fechaHoy = datetime.today().strftime("%Y-%m-%d %H:%M")
     print("Terminado:", fechaHoy)
 
-    print("Excel disponible en: ", fr"{directorio_padre}/xml_leidos.xlsx")
+    print("Excel disponible en: ", fr"{directorio_padre}/xml_nomina_leidos.xlsx")
